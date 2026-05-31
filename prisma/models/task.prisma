@@ -1,0 +1,87 @@
+model Task {
+  id String @id @default(uuid())
+
+  title String
+  description String?
+
+  listId String
+  parentId String?
+  statusId String
+
+  priority TaskPriority @default(MEDIUM)
+
+  position Decimal @default(0)
+
+  startDate DateTime?
+  dueDate DateTime?
+
+  createdById String
+
+  list List @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  status Status @relation(fields: [statusId], references: [id])
+
+  parent Task? @relation("TaskTree", fields: [parentId], references: [id])
+  subtasks Task[] @relation("TaskTree")
+
+  assignments TaskAssignment[]
+  watchers TaskWatcher[]
+
+  comments Comment[]
+  activities Activity[]
+  attachments Attachment[]
+  checklistItems ChecklistItem[]
+
+  tags TaskTag[]
+
+  customValues TaskCustomFieldValue[]
+
+  relationsFrom TaskRelation[] @relation("FromTask")
+  relationsTo TaskRelation[] @relation("ToTask")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model Status {
+  id String @id @default(uuid())
+
+  name String
+  color String
+
+  position Int
+  isClosed Boolean @default(false)
+
+  spaceId String
+
+  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  tasks Task[]
+}
+
+model TaskAssignment {
+  taskId String
+  userId String
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, userId])
+}
+
+model TaskWatcher {
+  taskId String
+  userId String
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, userId])
+}

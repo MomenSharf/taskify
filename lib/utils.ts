@@ -1,4 +1,4 @@
-import { avatarColors } from "@/constants";
+import { avatarColors } from "@/lib/config/constants/index";
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 

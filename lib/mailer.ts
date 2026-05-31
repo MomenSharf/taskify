@@ -16,6 +16,10 @@ type SendEmailOptions = {
   text?: string;
 };
 
+/* =========================
+   CORE EMAIL SENDER
+========================= */
+
 const sendEmail = async ({
   to,
   subject,
@@ -23,17 +27,30 @@ const sendEmail = async ({
   text,
 }: SendEmailOptions) => {
   try {
-    return await transporter.sendMail({
+    await transporter.sendMail({
       from: process.env.SMTP_USER,
       to,
       subject,
       text,
       html,
     });
-  } catch {
-    throw new AppError("Email service failed to send message", 500);
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    throw new AppError(
+      "Failed to send email",
+      500,
+      "INTERNAL_ERROR",
+      error,
+    );
   }
 };
+
+/* =========================
+   EMAIL TEMPLATE
+========================= */
 
 const createEmailTemplate = ({
   title,
@@ -79,79 +96,83 @@ const createEmailTemplate = ({
   `;
 };
 
+/* =========================
+   VERIFICATION EMAIL
+========================= */
+
 export const sendVerificationEmail = async (
   email: string,
   verificationCode: string,
 ) => {
-  const html = createEmailTemplate({
-    title: "Verify your email",
-    description: "Use the code below to complete your registration.",
-    content: `
-      <div style="
-        display:inline-block;
-        background:#eef2ff;
-        color:#3730a3;
-        padding:14px 22px;
-        border-radius:8px;
-        font-size:26px;
-        font-weight:700;
-        letter-spacing:4px;
-      ">
-        ${verificationCode}
-      </div>
-    `,
-    footer: "This code expires in 10 minutes. Ignore if you didn't request it.",
-  });
-
   await sendEmail({
     to: email,
     subject: "Taskify - Verification Code",
     text: `Your verification code is: ${verificationCode}`,
-    html,
+    html: createEmailTemplate({
+      title: "Verify your email",
+      description: "Use the code below to complete your registration.",
+      content: `
+        <div style="
+          display:inline-block;
+          background:#eef2ff;
+          color:#3730a3;
+          padding:14px 22px;
+          border-radius:8px;
+          font-size:26px;
+          font-weight:700;
+          letter-spacing:4px;
+        ">
+          ${verificationCode}
+        </div>
+      `,
+      footer: "This code expires in 10 minutes.",
+    }),
   });
 
   return {
     success: true,
-    message: "Verification email sent successfully",
+    message: "Verification email sent",
   };
 };
+
+/* =========================
+   RESET EMAIL
+========================= */
 
 export const sendResetPasswordEmail = async (
   email: string,
   resetUrl: string,
 ) => {
-  const html = createEmailTemplate({
-    title: "Reset your password",
-    description: "Click the button below to reset your password.",
-    content: `
-      <a
-        href="${resetUrl}"
-        style="
-          display:inline-block;
-          background:#4f46e5;
-          color:#ffffff;
-          text-decoration:none;
-          padding:12px 20px;
-          border-radius:8px;
-          font-size:14px;
-          font-weight:600;
-        "
-      >
-        Reset Password
-      </a>
-    `,
-    footer: "This link expires in 10 minutes. Ignore if not requested.",
-  });
-
   await sendEmail({
     to: email,
     subject: "Taskify - Password Reset",
-    text: `Reset your password using this link: ${resetUrl}`,
-    html,
+    text: `Reset your password: ${resetUrl}`,
+    html: createEmailTemplate({
+      title: "Reset your password",
+      description: "Click the button below to reset your password.",
+      content: `
+        <a
+          href="${resetUrl}"
+          style="
+            display:inline-block;
+            background:#4f46e5;
+            color:#ffffff;
+            text-decoration:none;
+            padding:12px 20px;
+            border-radius:8px;
+            font-size:14px;
+            font-weight:600;
+          "
+        >
+          Reset Password
+        </a>
+      `,
+      footer: "This link expires in 10 minutes.",
+    }),
   });
 
   return {
     success: true,
-    message: "Password reset email sent successfully",
+    message: "Password reset email sent",
   };
 };

@@ -1,0 +1,136 @@
+model Workspace {
+  id String @id @default(uuid())
+
+  name String
+  slug String @unique
+
+  ownerId String
+  owner User @relation("WorkspaceOwner", fields: [ownerId], references: [id])
+
+  members WorkspaceMember[]
+  teams Team[]
+  invites Invite[]
+  roles Role[]
+  auditLogs AuditLog[]
+
+  spaces Space[]
+  tags Tag[]
+
+  settings WorkspaceSetting?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WorkspaceMember {
+  id String @id @default(uuid())
+
+  workspaceId String
+  userId String
+  roleId String
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id])
+
+  teams TeamMember[]
+
+  @@unique([workspaceId, userId])
+}
+
+model WorkspaceSetting {
+  id String @id @default(uuid())
+
+  workspaceId String @unique
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Role {
+  id String @id @default(uuid())
+
+  name String
+  workspaceId String
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  members WorkspaceMember[]
+  permissions RolePermission[]
+
+  invites Invite[]
+}
+
+model Permission {
+  id String @id @default(uuid())
+  key String @unique
+
+  roles RolePermission[]
+}
+
+model RolePermission {
+  roleId String
+  permissionId String
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model Team {
+  id String @id @default(uuid())
+
+  name String
+  workspaceId String
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  members TeamMember[]
+}
+
+model TeamMember {
+  teamId String
+  memberId String
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  member WorkspaceMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@id([teamId, memberId])
+}
+
+model Invite {
+  id String @id @default(uuid())
+
+  email String
+  workspaceId String
+  roleId String
+
+  status InviteStatus @default(PENDING)
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model AuditLog {
+  id String @id @default(uuid())
+
+  workspaceId String
+  actorId String
+
+  action String
+  payload Json
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}

@@ -1,4 +1,4 @@
-import { SignupForm } from "@/components/Auth/signup-form";
+import { SignupForm } from "@/components/Auth/singup-form";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
@@ -8,7 +8,5 @@ export default async function SignupPage() {
   if (session) {
     return redirect("/");
   }
-  return (
-   <SignupForm />
-  );
+  return <SignupForm />;
 }

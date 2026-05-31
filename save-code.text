@@ -1,195 +1,81 @@
-"use client";
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
 
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import Image from "next/image";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { signinSchema, SigninInput } from "@/lib/validations/auth";
-import { Icons } from "../Icons";
-import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
-import { signIn } from "next-auth/react";
-import { toast } from "sonner";
+datasource db {
+  provider = "postgresql"
+}
 
-export function SigninForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
-  const [showPassword, setShowPassword] = useState(false);
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String          @unique
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  avatarColor         String?
+  accounts      Account[]
+  sessions      Session[]
+  // Optional for WebAuthn support
+  Authenticator Authenticator[]
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<SigninInput>({
-    resolver: zodResolver(signinSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
-  const onSubmit = async (data: SigninInput) => {
-    const res = await signIn("credentials", {
-      redirect: false,
-      email: data.email,
-      password: data.password,
-    });
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
 
-    if (!res) {
-      toast.error("Something went wrong. Try again later.");
-      return;
-    }
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    if (res.error) {
-      toast.error(mapAuthError(res.error));
-      return;
-    }
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    toast.success("Login successful");
-  };
+  @@id([provider, providerAccountId])
+}
 
-  function mapAuthError(error: string) {
-    switch (error) {
-      case "MISSING_CREDENTIALS":
-        return "Please fill in all fields";
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-      case "INVALID_EMAIL":
-        return "No account found with this email";
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
-      case "INVALID_PASSWORD":
-        return "Incorrect password";
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+  createdAt DateTime @default(now())
 
-      case "NO_PASSWORD_ACCOUNT":
-        return "This account uses a different sign-in method";
+  @@id([identifier, token])
+}
 
-      case "EMAIL_NOT_VERIFIED":
-        return "Please verify your email before continuing";
+// Optional for WebAuthn support
+model Authenticator {
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
 
-      case "CredentialsSignin":
-        return "Email or password is incorrect";
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-      default:
-        return "Something went wrong. Please try again";
-    }
-  }
-
-  return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="overflow-hidden p-0">
-        <CardContent className="grid p-0 md:grid-cols-2">
-          <form onSubmit={handleSubmit(onSubmit)} className="p-6 md:p-8">
-            <FieldGroup>
-              <div className="flex flex-col items-center gap-2 text-center">
-                <h1 className="text-2xl font-bold">Welcome back</h1>
-                <p className="text-sm text-muted-foreground">
-                  Login to your account
-                </p>
-              </div>
-
-              <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  {...register("email")}
-                />
-                {errors.email && (
-                  <FieldDescription className="text-red-500">
-                    {errors.email.message}
-                  </FieldDescription>
-                )}
-              </Field>
-
-              <Field>
-                <div className="flex items-center justify-between">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <Link
-                    href="#"
-                    className="text-sm underline-offset-2 hover:underline"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    className="pr-10"
-                    type={showPassword ? "text" : "password"}
-                    {...register("password")}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="absolute right-0 top-0  rounded-tl-none rounded-bl-none rounded-tr-md rounded-br-md bg-background focus:ring-0"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-3 h-3" />
-                    )}
-                  </Button>
-                </div>
-
-                {errors.password && (
-                  <FieldDescription className="text-red-500">
-                    {errors.password.message}
-                  </FieldDescription>
-                )}
-              </Field>
-
-              <Field>
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isSubmitting}
-                >
-                  Login
-                </Button>
-              </Field>
-
-              <FieldSeparator>Or continue with</FieldSeparator>
-
-              <Field className="grid grid-cols-1 gap-3">
-                <Button variant="outline" type="button">
-                  <Icons.google className="size-5" />
-                  Continue with Google
-                </Button>
-              </Field>
-
-              <FieldDescription className="text-center">
-                Don&apos;t have an account?{" "}
-                <Link href="/signup" className="underline">
-                  Sign up
-                </Link>
-              </FieldDescription>
-            </FieldGroup>
-          </form>
-
-          <div className="relative hidden bg-muted md:block">
-            <Image
-              src="/assets/images/signin-page.jpg"
-              alt="Signin"
-              fill
-              className="object-cover dark:brightness-[0.2] dark:grayscale"
-            />
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  @@unique([userId, credentialID])
 }

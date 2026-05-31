@@ -1,0 +1,191 @@
+src/
+│
+├── app/
+│   │
+│   ├── (auth)/
+│   │   ├── login/
+│   │   ├── register/
+│   │   └── reset-password/
+│   │
+│   ├── (dashboard)/
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   │
+│   │   ├── workspaces/
+│   │   │   ├── page.tsx
+│   │   │   ├── [workspaceId]/
+│   │   │   │   ├── page.tsx
+│   │   │   │   ├── settings/
+│   │   │   │   ├── members/
+│   │   │   │   ├── teams/
+│   │   │   │   ├── audit/
+│   │   │   │   └── invites/
+│   │   │   │
+│   │   │   └── create/
+│   │   │
+│   │   ├── teams/
+│   │   │   ├── page.tsx
+│   │   │   └── [teamId]/
+│   │   │
+│   │   ├── tasks/
+│   │   │   ├── page.tsx
+│   │   │   └── [taskId]/
+│   │   │
+│   │   └── profile/
+│   │       └── page.tsx
+│   │
+│   └── actions/                      # 🔥 ALL SERVER ACTIONS HERE
+│       │
+│       ├── auth/
+│       │   ├── login.action.ts
+│       │   ├── register.action.ts
+│       │   ├── logout.action.ts
+│       │   └── session.action.ts
+│       │
+│       ├── user/
+│       │   ├── get-user.action.ts
+│       │   ├── update-user.action.ts
+│       │   ├── delete-user.action.ts
+│       │   └── user-settings.action.ts
+│       │
+│       ├── workspace/
+│       │   ├── create-workspace.action.ts
+│       │   ├── update-workspace.action.ts
+│       │   ├── delete-workspace.action.ts
+│       │   ├── get-workspace.action.ts
+│       │   ├── list-workspaces.action.ts
+│       │   │
+│       │   ├── members/
+│       │   │   ├── add-member.action.ts
+│       │   │   ├── remove-member.action.ts
+│       │   │   ├── update-member-role.action.ts
+│       │   │   └── list-members.action.ts
+│       │   │
+│       │   ├── invites/
+│       │   │   ├── create-invite.action.ts
+│       │   │   ├── accept-invite.action.ts
+│       │   │   ├── reject-invite.action.ts
+│       │   │   └── resend-invite.action.ts
+│       │   │
+│       │   ├── settings/
+│       │   │   ├── get-settings.action.ts
+│       │   │   └── update-settings.action.ts
+│       │   │
+│       │   └── audit/
+│       │       ├── get-logs.action.ts
+│       │       └── create-log.action.ts
+│       │
+│       ├── rbac/
+│       │   ├── check-permission.action.ts
+│       │   ├── get-user-permissions.action.ts
+│       │   ├── create-role.action.ts
+│       │   ├── update-role.action.ts
+│       │   ├── delete-role.action.ts
+│       │   │
+│       │   ├── roles/
+│       │   │   ├── list-roles.action.ts
+│       │   │   ├── assign-role.action.ts
+│       │   │   └── remove-role.action.ts
+│       │   │
+│       │   └── permissions/
+│       │       ├── list-permissions.action.ts
+│       │       └── sync-permissions.action.ts
+│       │
+│       ├── team/
+│       │   ├── create-team.action.ts
+│       │   ├── update-team.action.ts
+│       │   ├── delete-team.action.ts
+│       │   ├── get-team.action.ts
+│       │   │
+│       │   └── members/
+│       │       ├── add-team-member.action.ts
+│       │       ├── remove-team-member.action.ts
+│       │       └── list-team-members.action.ts
+│       │
+│       ├── task/
+│       │   ├── create-task.action.ts
+│       │   ├── update-task.action.ts
+│       │   ├── delete-task.action.ts
+│       │   ├── get-task.action.ts
+│       │   ├── list-tasks.action.ts
+│       │   ├── assign-task.action.ts
+│       │   ├── move-task.action.ts
+│       │   └── comment-task.action.ts
+│       │
+│       └── notifications/
+│           ├── send-notification.action.ts
+│           ├── get-notifications.action.ts
+│           └── mark-read.action.ts
+│
+│
+├── lib/
+│   │
+│   ├── db/
+│   │   └── prisma.ts
+│   │
+│   ├── auth/
+│   │   ├── session.ts
+│   │   ├── current-user.ts
+│   │   ├── require-auth.ts
+│   │   └── password/
+│   │       ├── hash.ts
+│   │       └── verify.ts
+│   │
+│   ├── rbac/
+│   │   ├── permissions.ts
+│   │   ├── roles.ts
+│   │   ├── has-permission.ts
+│   │   ├── guard.ts
+│   │   └── rbac.service.ts
+│   │
+│   ├── workspace/
+│   │   ├── workspace.service.ts
+│   │   ├── workspace-members.service.ts
+│   │   ├── workspace-invites.service.ts
+│   │   ├── workspace-settings.service.ts
+│   │   └── workspace.repo.ts
+│   │
+│   ├── user/
+│   │   ├── user.service.ts
+│   │   ├── user.repo.ts
+│   │   └── user.types.ts
+│   │
+│   ├── team/
+│   │   ├── team.service.ts
+│   │   ├── team.repo.ts
+│   │   └── team-members.service.ts
+│   │
+│   ├── task/
+│   │   ├── task.service.ts
+│   │   ├── task.repo.ts
+│   │   └── task.types.ts
+│   │
+│   ├── audit/
+│   │   ├── audit.service.ts
+│   │   └── audit.repo.ts
+│   │
+│   ├── utils/
+│   │   ├── errors.ts
+│   │   ├── response.ts
+│   │   ├── slug.ts
+│   │   └── crypto.ts
+│   │
+│   └── config/
+│       ├── permissions.seed.ts
+│       ├── roles.seed.ts
+│       └── constants.ts
+│
+│
+├── hooks/
+│   ├── use-user.ts
+│   ├── use-workspace.ts
+│   ├── use-permission.ts
+│   ├── use-role.ts
+│   └── use-team.ts
+│
+│
+├── types/
+│   ├── auth.types.ts
+│   ├── workspace.types.ts
+│   ├── rbac.types.ts
+│   └── api.types.ts

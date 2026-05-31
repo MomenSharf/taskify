@@ -1,0 +1,174 @@
+model Comment {
+  id String @id @default(uuid())
+
+  content String
+
+  taskId String
+  userId String
+  parentId String?
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  parent Comment? @relation("CommentTree", fields: [parentId], references: [id])
+  replies Comment[] @relation("CommentTree")
+
+  createdAt DateTime @default(now())
+}
+
+model Activity {
+  id String @id @default(uuid())
+
+  taskId String
+  userId String
+
+  type String
+  payload Json
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model Attachment {
+  id String @id @default(uuid())
+
+  taskId String
+
+  url String
+  fileName String
+  mimeType String
+  size Int
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model ChecklistItem {
+  id String @id @default(uuid())
+
+  taskId String
+
+  title String
+  completed Boolean @default(false)
+  position Int @default(0)
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model TaskRelation {
+  id String @id @default(uuid())
+
+  type String
+
+  fromTaskId String
+  toTaskId String
+
+  fromTask Task @relation("FromTask", fields: [fromTaskId], references: [id], onDelete: Cascade)
+  toTask Task @relation("ToTask", fields: [toTaskId], references: [id], onDelete: Cascade)
+}
+
+model Tag {
+  id String @id @default(uuid())
+
+  workspaceId String
+
+  name String
+  color String
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  tasks TaskTag[]
+}
+
+model TaskTag {
+  taskId String
+  tagId String
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  tag Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, tagId])
+}
+
+model Favorite {
+  userId String
+  itemId String
+  itemType String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, itemId, itemType])
+}
+
+model Notification {
+  id String @id @default(uuid())
+
+  userId String
+
+  title String
+  message String
+  read Boolean @default(false)
+
+  data Json?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model CustomField {
+  id String @id @default(uuid())
+
+  name String
+  type String
+
+  spaceId String
+
+  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  values TaskCustomFieldValue[]
+}
+
+model TaskCustomFieldValue {
+  taskId String
+  fieldId String
+
+  value Json
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  field CustomField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, fieldId])
+}
+
+model View {
+  id String @id @default(uuid())
+
+  name String
+  type String
+
+  config Json
+
+  spaceId String?
+
+  folderId String?
+
+  listId String?
+
+  space Space? @relation(fields: [spaceId], references: [id])
+  folder Folder? @relation(fields: [folderId], references: [id])
+  list List? @relation(fields: [listId], references: [id])
+}
+
+model Doc {
+  id String @id @default(uuid())
+
+  title String
+  content Json
+
+  workspaceId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

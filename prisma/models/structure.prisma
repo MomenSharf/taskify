@@ -1,0 +1,48 @@
+model Space {
+  id String @id @default(uuid())
+
+  name String
+  slug String @unique
+
+  workspaceId String
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  folders Folder[]
+  statuses Status[]
+  views View[]
+  customFields CustomField[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Folder {
+  id String @id @default(uuid())
+
+  name String
+  slug String @unique
+
+  spaceId String
+
+  space Space @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  lists List[]
+
+  views View[]
+}
+
+model List {
+  id String @id @default(uuid())
+
+  name String
+  slug String @unique
+
+  folderId String
+
+  folder Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+
+  tasks Task[]
+
+  views View[]
+}
