@@ -1,5 +1,5 @@
 import { validateEmailVerificationRequest } from "@/app/actions/auth/verification-email.action";
-import VerifyCode from "@/components/Auth/verify-code";
+import VerifyCode from "@/components/auth/verify-code";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
@@ -17,7 +17,6 @@ export default async function page({
   }
 
   if (!email || Array.isArray(email)) {
-    
     return redirect("/signin");
   }
   let res;
@@ -27,13 +26,20 @@ export default async function page({
     if (!(err instanceof Error)) {
       return redirect("/signin");
     }
-    
+
     return redirect(`signin?errorMessage=${encodeURIComponent(err.message)}`);
   }
-  
-  if (res.redirect) return redirect(res.redirect);
-  
-  if(!res.attempts || !res.attempts) return redirect('/signin')
 
-  return <VerifyCode email={email} initialCooldown={res.secondsLeft} attemptsLeftServer={res.attempts} maxAttempts={res.maxAttempts}  />;
+  if (res.redirect) return redirect(res.redirect);
+
+  if (!res.attempts || !res.attempts) return redirect("/signin");
+
+  return (
+    <VerifyCode
+      email={email}
+      initialCooldown={res.secondsLeft}
+      attemptsLeftServer={res.attempts}
+      maxAttempts={res.maxAttempts}
+    />
+  );
 }

@@ -1,5 +1,5 @@
 import { verifyToken } from "@/app/actions/auth/forgot-password.action";
-import ResetPassword from "@/components/Auth/reset-password";
+import ResetPassword from "@/components/auth/reset-password";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
@@ -16,7 +16,7 @@ export default async function ResetPasswordPage({
   if (session) {
     return redirect("/");
   }
-  
+
   if (!token || !email || Array.isArray(token) || Array.isArray(email)) {
     return redirect(
       `signin?errorMessage=${encodeURIComponent("Invalid reset link")}`,

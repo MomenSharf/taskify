@@ -1,4 +1,4 @@
-import ForgotPassword from "@/components/Auth/forgot-password";
+import ForgotPassword from "@/components/auth/forgot-password";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
