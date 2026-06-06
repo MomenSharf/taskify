@@ -5,18 +5,18 @@ import {
   resetPasswordSchema,
 } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+import { resetPassword } from "@/app/actions/auth/forgot-password.action";
+import { IconEye, IconEyeOff, IconLock } from "@tabler/icons-react";
 import { Button } from "../ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
-import { AuthWrapper } from "./auth-wrapper";
-import { resetPassword } from "@/app/actions/auth/forgot-password.action";
 import { Spinner } from "../ui/spinner";
+import { AuthWrapper } from "./auth-wrapper";
 
 export default function ResetPassword({
   token,
@@ -30,7 +30,11 @@ export default function ResetPassword({
 
   const router = useRouter();
 
-  const  {handleSubmit, control, formState: {isSubmitting}} = useForm<ResetPasswordInput>({
+  const {
+    handleSubmit,
+    control,
+    formState: { isSubmitting },
+  } = useForm<ResetPasswordInput>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
       password: "",
@@ -54,10 +58,7 @@ export default function ResetPassword({
   };
 
   return (
-    <AuthWrapper
-      imgUrl="/assets/images/signin-page.jpg"
-      icon={<Lock className="size-6" />}
-    >
+    <AuthWrapper imgUrl="/assets/images/signin-page.jpg" icon={<IconLock />}>
       <form onSubmit={handleSubmit(onSubmit)} className="min-h-56">
         <FieldGroup className="min-h-72">
           <div className="flex flex-col gap-2 text-center">
@@ -92,11 +93,7 @@ export default function ResetPassword({
                       className="absolute right-0 top-0 rounded-l-none bg-background"
                       onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
+                      {showPassword ? <IconEye /> : <IconEyeOff />}
                     </Button>
                   </div>
 
@@ -107,7 +104,7 @@ export default function ResetPassword({
               )}
             />
 
--            <Controller
+            <Controller
               name="confirmPassword"
               control={control}
               render={({ field, fieldState }) => (
@@ -134,11 +131,7 @@ export default function ResetPassword({
                         setShowConfirmPassword(!showConfirmPassword)
                       }
                     >
-                      {showConfirmPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
+                      {showConfirmPassword ? <IconEyeOff /> : <IconEye />}
                     </Button>
                   </div>
 
@@ -151,14 +144,8 @@ export default function ResetPassword({
           </div>
 
           <Field>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isSubmitting}
-            >
-              {isSubmitting && (
-                <Spinner data-icon="inline-start" />
-              )}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting && <Spinner data-icon="inline-start" />}
               Create Account
             </Button>
           </Field>

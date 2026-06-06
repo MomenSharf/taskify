@@ -38,18 +38,27 @@ export class AppError extends Error {
       meta: this.meta,
     };
   }
-
   static from(error: unknown): AppError {
     if (error instanceof AppError) return error;
 
+    console.error("AppError.from:", error);
+
     if (error instanceof Error) {
-      return new AppError(error.message, 500, "INTERNAL_ERROR", {
-        name: error.name,
-        stack: error.stack,
-      });
+      return new AppError(
+        "Something went wrong. Please try again later.",
+        500,
+        "INTERNAL_ERROR",
+        {
+          name: error.name,
+        },
+      );
     }
 
-    return new AppError("Unknown error occurred", 500, "INTERNAL_ERROR", error);
+    return new AppError(
+      "Something went wrong. Please try again later.",
+      500,
+      "INTERNAL_ERROR",
+    );
   }
 }
 export const badRequest = (message = "Bad Request") =>

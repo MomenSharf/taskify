@@ -1,0 +1,17 @@
+model Image {
+  id        String   @id @default(uuid())
+
+  url       String
+  key       String   @unique
+
+  alt       String?
+  size      Int?
+  mimeType  String?
+
+  entityType String
+  entityId   String
+
+  createdAt DateTime @default(now())
+
+  @@index([entityType, entityId])
+}

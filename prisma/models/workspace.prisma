@@ -1,20 +1,24 @@
 model Workspace {
   id String @id @default(uuid())
 
-  name String
-  slug String @unique
+  name        String
+  slug        String  @unique
+  description String?
+
+  type WorkspaceType @default(PERSONAL)
+
+  visibility WorkspaceVisibility @default(PRIVATE)
 
   ownerId String
-  owner User @relation("WorkspaceOwner", fields: [ownerId], references: [id])
+  owner   User   @relation("WorkspaceOwner", fields: [ownerId], references: [id])
 
-  members WorkspaceMember[]
-  teams Team[]
-  invites Invite[]
-  roles Role[]
+  members   WorkspaceMember[]
+  teams     Team[]
+  invites   Invite[]
+  roles     Role[]
   auditLogs AuditLog[]
-
-  spaces Space[]
-  tags Tag[]
+  spaces    Space[]
+  tags      Tag[]
 
   settings WorkspaceSetting?
 
@@ -22,58 +26,76 @@ model Workspace {
   updatedAt DateTime @updatedAt
 }
 
+model WorkspaceSetting {
+  id String @id @default(uuid())
+
+  workspaceId String    @unique
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  allowInvites  Boolean @default(true)
+  isPrivate     Boolean @default(false)
+  defaultRoleId String?
+  theme         String  @default("system")
+  maxMembers    Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum WorkspaceType {
+  PERSONAL
+  COMPANY
+  SCHOOL
+  PROJECT
+}
+
+enum WorkspaceVisibility {
+  PUBLIC
+  PRIVATE
+}
+
 model WorkspaceMember {
   id String @id @default(uuid())
 
   workspaceId String
-  userId String
-  roleId String
+  userId      String
+  roleId      String
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role Role @relation(fields: [roleId], references: [id])
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role      @relation(fields: [roleId], references: [id])
 
   teams TeamMember[]
 
   @@unique([workspaceId, userId])
 }
 
-model WorkspaceSetting {
-  id String @id @default(uuid())
-
-  workspaceId String @unique
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model Role {
   id String @id @default(uuid())
 
-  name String
+  name        String
   workspaceId String
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
-  members WorkspaceMember[]
+  members     WorkspaceMember[]
   permissions RolePermission[]
 
   invites Invite[]
 }
 
 model Permission {
-  id String @id @default(uuid())
+  id  String @id @default(uuid())
   key String @unique
 
   roles RolePermission[]
 }
 
 model RolePermission {
-  roleId String
+  roleId       String
   permissionId String
 
-  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@id([roleId, permissionId])
@@ -82,7 +104,7 @@ model RolePermission {
 model Team {
   id String @id @default(uuid())
 
-  name String
+  name        String
   workspaceId String
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
@@ -91,10 +113,10 @@ model Team {
 }
 
 model TeamMember {
-  teamId String
+  teamId   String
   memberId String
 
-  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  team   Team            @relation(fields: [teamId], references: [id], onDelete: Cascade)
   member WorkspaceMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
   @@id([teamId, memberId])
@@ -103,14 +125,14 @@ model TeamMember {
 model Invite {
   id String @id @default(uuid())
 
-  email String
+  email       String
   workspaceId String
-  roleId String
+  roleId      String
 
   status InviteStatus @default(PENDING)
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  role Role @relation(fields: [roleId], references: [id])
+  role      Role      @relation(fields: [roleId], references: [id])
 
   createdAt DateTime @default(now())
 }
@@ -125,9 +147,9 @@ model AuditLog {
   id String @id @default(uuid())
 
   workspaceId String
-  actorId String
+  actorId     String
 
-  action String
+  action  String
   payload Json
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)

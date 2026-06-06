@@ -11,20 +11,18 @@ import {
 
 import { cn } from "@/lib/utils";
 import {
-  BarChart3,
-  Calendar,
-  CheckSquare,
-  FileText,
-  FolderKanban,
-  LayoutDashboard,
-  LucideIcon,
-  Pin,
-  Settings,
-  Settings2,
-  Users,
-} from "lucide-react";
-
-import { useState } from "react";
+  IconAdjustments,
+  IconBrandGoogleAnalytics,
+  IconFile,
+  IconHome,
+  IconPin,
+  IconPlanet,
+  IconProps,
+  IconSettings,
+  IconSparkle2,
+  IconUsers
+} from "@tabler/icons-react";
+import { ComponentType, useState } from "react";
 import { Button } from "../ui/button";
 
 type NavItemState = "selected" | "firstPending" | "secondPending" | "inMore";
@@ -32,57 +30,51 @@ type NavItemState = "selected" | "firstPending" | "secondPending" | "inMore";
 type NavItem = {
   key: string;
   label: string;
-  icon: LucideIcon;
+  icon: ComponentType<IconProps>;
   state: NavItemState;
 };
 
 const NAV_ITEMS: NavItem[] = [
   {
-    key: "dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
+    key: "home",
+    label: "Home",
+    icon: IconHome,
     state: "selected",
   },
   {
-    key: "tasks",
-    label: "Tasks",
-    icon: CheckSquare,
+    key: "spaces",
+    label: "Spaces",
+    icon: IconPlanet,
     state: "firstPending",
   },
   {
-    key: "projects",
-    label: "Projects",
-    icon: FolderKanban,
+    key: "teams",
+    label: "Teams",
+    icon: IconUsers,
     state: "secondPending",
   },
   {
-    key: "calendar",
-    label: "Calendar",
-    icon: Calendar,
-    state: "inMore",
-  },
-  {
-    key: "team",
-    label: "Team",
-    icon: Users,
+    key: "ai",
+    label: "AI",
+    icon: IconSparkle2,
     state: "inMore",
   },
   {
     key: "analytics",
     label: "Analytics",
-    icon: BarChart3,
+    icon: IconBrandGoogleAnalytics,
     state: "inMore",
   },
   {
     key: "files",
     label: "Files",
-    icon: FileText,
+    icon: IconFile,
     state: "inMore",
   },
   {
     key: "settings",
     label: "Settings",
-    icon: Settings,
+    icon: IconSettings,
     state: "inMore",
   },
 ];
@@ -121,7 +113,11 @@ export default function NavSwitcher() {
   )!;
 
   const inMoreItems = navItems.filter((item) => item.state === "inMore");
-
+  console.log('secondPendingItem');
+  console.log(secondPendingItem);
+  
+  if (!selectedItem || !firstPendingItem || !secondPendingItem) return null;
+  
   return (
     <div className="flex items-center justify-center gap-3 rounded-md  px-2 py-2">
       {[selectedItem, firstPendingItem, secondPendingItem].map((item) => (
@@ -154,7 +150,7 @@ export default function NavSwitcher() {
             variant="outline"
             className="flex h-10 w-10 flex-col"
           >
-            <Settings2 className="size-4" />
+            <IconAdjustments />
             <span className="text-xxs font-bold">More</span>
           </Button>
         </DropdownMenuTrigger>
@@ -179,7 +175,7 @@ export default function NavSwitcher() {
                     swapState(item, firstPendingItem, "firstPending");
                   }}
                 >
-                  <Pin className="size-3 group-hover:fill-muted-foreground group-hover:stroke-muted-foreground" />
+                  <IconPin className="group-hover:fill-popover-foreground group-hover:stroke-popover-foreground" />
                   <span className="absolute left-0 top-0 flex h-3 w-3 items-center justify-center text-xxs">
                     1
                   </span>
@@ -192,7 +188,7 @@ export default function NavSwitcher() {
                     swapState(item, secondPendingItem, "secondPending");
                   }}
                 >
-                  <Pin className="size-3 group-hover:fill-muted-foreground group-hover:stroke-muted-foreground" />
+                  <IconPin className="group-hover:fill-popover-foreground group-hover:stroke-popover-foreground" />
                   <span className="absolute left-0 top-0 flex h-3 w-3 items-center justify-center text-xxs">
                     2
                   </span>

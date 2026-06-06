@@ -19,6 +19,7 @@ export default async function page({
   if (!email || Array.isArray(email)) {
     return redirect("/signin");
   }
+
   let res;
   try {
     res = await validateEmailVerificationRequest(email);
@@ -32,7 +33,17 @@ export default async function page({
 
   if (res.redirect) return redirect(res.redirect);
 
-  if (!res.attempts || !res.attempts) return redirect("/signin");
+  const { attempts, maxAttempts, secondsLeft } = res;
+
+  if (
+    !(
+      typeof attempts === "number" &&
+      typeof maxAttempts === "number" &&
+      typeof secondsLeft === "number"
+    )
+  ) {
+    return redirect("/signin");
+  }
 
   return (
     <VerifyCode

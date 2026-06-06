@@ -11,7 +11,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { SigninInput, signinSchema } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, LogIn } from "lucide-react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -21,7 +20,9 @@ import { toast } from "sonner";
 import { Icons } from "../Icons";
 import { AuthWrapper } from "./auth-wrapper";
 import { Spinner } from "../ui/spinner";
+import { IconEye, IconEyeOff, IconLogin } from "@tabler/icons-react";
 
+// TODO: Google provider
 export function SigninForm() {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -62,6 +63,7 @@ export function SigninForm() {
     }
 
     toast.success("Login successful");
+    router.push("/");
   };
 
   function mapAuthError(error: string) {
@@ -70,13 +72,12 @@ export function SigninForm() {
         return "Please fill in all fields";
       case "INVALID_EMAIL":
         return "No account found with this email";
-      case "INVALID_PASSWORD":
-        return "Incorrect password";
       case "NO_PASSWORD_ACCOUNT":
         return "This account uses a different sign-in method";
       case "EMAIL_NOT_VERIFIED":
         return "Please verify your email before continuing";
       case "CredentialsSignin":
+      case "INVALID_PASSWORD":
         return "Email or password is incorrect";
       default:
         return "Something went wrong. Please try again";
@@ -86,7 +87,7 @@ export function SigninForm() {
   return (
     <AuthWrapper
       imgUrl="/assets/images/signin-page.jpg"
-      icon={<LogIn className="size-4" />}
+      icon={<IconLogin className="size-4" />}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         <FieldGroup>
@@ -149,11 +150,7 @@ export function SigninForm() {
                     className="absolute right-0 top-0 rounded-l-none bg-background"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
+                    {showPassword ? <IconEyeOff /> : <IconEye />}
                   </Button>
                 </div>
 

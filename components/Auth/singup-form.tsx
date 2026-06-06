@@ -1,5 +1,6 @@
 "use client";
 
+import { signup } from "@/app/actions/auth/signup.action";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -11,16 +12,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { SignupInput, signupSchema } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, UserPlus } from "lucide-react";
+import {
+  IconEye,
+  IconEyeOff,
+  IconUserPlus
+} from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Icons } from "../Icons";
-import { AuthWrapper } from "./auth-wrapper";
-import { signup } from "@/app/actions/auth/signup.action";
 import { Spinner } from "../ui/spinner";
+import { AuthWrapper } from "./auth-wrapper";
 
 export function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -60,7 +64,7 @@ export function SignupForm() {
   return (
     <AuthWrapper
       imgUrl="/assets/images/signup-page.jpg"
-      icon={<UserPlus className="size-4" />}
+      icon={<IconUserPlus />}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         <FieldGroup>
@@ -135,11 +139,7 @@ export function SignupForm() {
                       className="absolute right-0 top-0 rounded-l-none bg-background"
                       onClick={() => setShowPassword(!showPassword)}
                     >
-                      {showPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
+                      {showPassword ? <IconEyeOff /> : <IconEye />}
                     </Button>
                   </div>
 
@@ -177,11 +177,7 @@ export function SignupForm() {
                         setShowConfirmPassword(!showConfirmPassword)
                       }
                     >
-                      {showConfirmPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
+                      {showConfirmPassword ? <IconEyeOff /> : <IconEye />}
                     </Button>
                   </div>
 

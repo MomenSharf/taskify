@@ -5,7 +5,6 @@ import {
   forgotPasswordSchema,
 } from "@/lib/validations/auth"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Fingerprint } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -13,9 +12,10 @@ import { toast } from "sonner"
 import { Button } from "../ui/button"
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field"
 import { Input } from "../ui/input"
-import { AuthWrapper } from "./auth-wrapper"
 import { createAndSendPasswordResetToken } from "@/app/actions/auth/forgot-password.action"
 import { Spinner } from "../ui/spinner"
+import { AuthWrapper } from "./auth-wrapper"
+import { IconFingerprint } from "@tabler/icons-react"
 
 export default function ForgotPassword() {
   const router = useRouter()
@@ -45,7 +45,7 @@ export default function ForgotPassword() {
   return (
     <AuthWrapper
       imgUrl="/assets/images/signin-page.jpg"
-      icon={<Fingerprint className="size-6" />}
+      icon={<IconFingerprint />}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="min-h-56">
         <FieldGroup className="min-h-72">

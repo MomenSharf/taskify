@@ -5,7 +5,6 @@ import { Field, FieldError, FieldGroup } from "@/components/ui/field";
 
 import { VerifyCodeInput, VerifyCodeSchema } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, MailCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
@@ -20,7 +19,9 @@ import {
 } from "@/app/actions/auth/verification-email.action";
 import { Spinner } from "../ui/spinner";
 import { AuthWrapper } from "./auth-wrapper";
+import { IconArrowLeft, IconMailCheck } from "@tabler/icons-react";
 
+// TODO: fix the error validation trigger when the user first input
 export default function VerifyCode({
   email,
   initialCooldown = 0,
@@ -137,7 +138,7 @@ export default function VerifyCode({
   return (
     <AuthWrapper
       imgUrl="/assets/images/verify-code-page.jpg"
-      icon={<MailCheck className="size-4" />}
+      icon={<IconMailCheck className="size-4" />}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         <FieldGroup>
@@ -189,7 +190,7 @@ export default function VerifyCode({
               href="/signin"
               className={buttonVariants({ variant: "link" })}
             >
-              <ArrowLeft />
+              <IconArrowLeft />
               back to Sign in
             </Link>
 
