@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import {
   Field,
@@ -27,13 +27,14 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ArrowRightIcon, ArrowLeftIcon } from "lucide-react";
 import {
-  InviteEmailsSchema,
   workspaceInfoSchema,
   WorkspaceInfoSchema,
 } from "@/lib/validations/create-workspac";
 import { Textarea } from "../ui/textarea";
 import { Switch } from "../ui/switch";
 import { Label } from "../ui/label";
+import { Badge } from "../ui/badge";
+import { IconX } from "@tabler/icons-react";
 import { WorkspaceType } from "@/app/generated/prisma/enums";
 
 const steps = [
@@ -61,13 +62,20 @@ const workspaceTypes = [
   { label: "Project", value: "PROJECT" },
 ] as const;
 
-const addressSchema = z.object({
-  street: z.string().min(5, "Street address is required"),
-  city: z.string().min(2, "City is required"),
-  zipCode: z.string().min(5, "ZIP code must be at least 5 characters"),
+export const emailSchema = z.object({
+  email: z.string().email("Invalid email address"),
 });
 
-type Address = z.infer<typeof addressSchema>;
+export type EmailSchema = z.infer<typeof emailSchema>;
+
+export const inviteEmailsSchema = z.object({
+  emails: z
+    .array(z.string().email())
+    .min(1, "At least one email is required")
+    .max(20, "Max 20 emails allowed"),
+});
+
+export type InviteEmailsSchema = z.infer<typeof inviteEmailsSchema>;
 
 type FormData = {
   info?: WorkspaceInfoSchema;
@@ -81,7 +89,7 @@ const WorkspaceInfoForm = ({
   defaultValues,
 }: {
   onNext: (d: WorkspaceInfoSchema) => void;
-  defaultValues: WorkspaceInfoSchema;
+  defaultValues?: WorkspaceInfoSchema;
 }) => {
   const form = useForm<WorkspaceInfoSchema>({
     resolver: zodResolver(workspaceInfoSchema),
@@ -205,95 +213,142 @@ const WorkspaceType = ({
   );
 };
 
-const AddressForm = ({
+const InviteEmails = ({
   onNext,
   onPrev,
   onReset,
-  defaultValues,
+  defualtInviteEmails,
   showPrev,
 }: {
-  onNext: (d: Address) => void;
+  onNext: (d: InviteEmailsSchema) => void;
   onPrev: () => void;
   onReset?: () => void;
-  defaultValues?: Address;
+  defualtInviteEmails?: InviteEmailsSchema;
   showPrev?: boolean;
 }) => {
-  const form = useForm<Address>({
-    resolver: zodResolver(addressSchema),
-    defaultValues: defaultValues || { street: "", city: "", zipCode: "" },
+  const [emails, setEmails] = useState<string[]>([]);
+  // const [error, setError] = useState<string | null>(null);
+  const form = useForm<EmailSchema>({
+    resolver: zodResolver(emailSchema),
+    defaultValues: { email: "" },
   });
+  const hasReachedMaxEmails = emails.length >= 15;
 
-  useEffect(() => {
-    form.reset(defaultValues || { street: "", city: "", zipCode: "" });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultValues]);
+  const onSubmit = (data: EmailSchema) => {
+    // if (emails.includes(data.email)) {
+    //   form.resetField("email");
+    //   return;
+    // }
+    setEmails((prev) => [...prev, data.email]);
+    form.resetField("email");
+  };
 
   return (
-    <form onSubmit={form.handleSubmit(onNext)} className="space-y-4">
-      <FieldGroup>
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="flex flex-col gap-3"
+    >
+      <h3 className="text-start font-bold text-lg">
+        Invite people to your Workspace:
+      </h3>
+      <div className="flex flex-wrap content-start gap-2 rounded-md border p-2 focus-within:ring-2 focus-within:ring-ring h-32 overscroll-y-auto overflow-x-hidden">
+        {['mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+          ,'mm@mm.fdsa'
+        ].map((email) => {
+          return (
+            <Badge key={email} className="items-center truncate" variant="outline">
+              {email}
+              <IconX
+                className="cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log("gadsf");
+
+                  setEmails((prev) => {
+                    return prev.filter((e) => e === email);
+                  });
+                }}
+              />
+            </Badge>
+          );
+        })}
         <Controller
-          name="street"
+          name="email"
           control={form.control}
           render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid} className="text-start">
-              <FieldLabel htmlFor="street">Street</FieldLabel>
-              <Input
+            <Field
+              className="flex-1  w-auto  min-w-40 p-1"
+              data-invalid={fieldState.invalid}
+            >
+              <input
                 {...field}
-                id="street"
-                placeholder="123 Main St"
+                id="email"
+                placeholder={
+                  hasReachedMaxEmails
+                    ? "You can invite up to 15 people."
+                    : "Enter email"
+                }
                 aria-invalid={fieldState.invalid}
+                disabled={hasReachedMaxEmails}
+                className="flex-1 min-w-30 bg-transparent outline-none"
               />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
         />
-
-        <Controller
-          name="city"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid} className="text-start">
-              <FieldLabel htmlFor="city">City</FieldLabel>
-              <Input
-                {...field}
-                id="city"
-                placeholder="New York"
-                aria-invalid={fieldState.invalid}
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-
-        <Controller
-          name="zipCode"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid} className="text-start">
-              <FieldLabel htmlFor="zipCode">ZIP Code</FieldLabel>
-              <Input
-                {...field}
-                id="zipCode"
-                placeholder="10001"
-                aria-invalid={fieldState.invalid}
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-      </FieldGroup>
-
-      <div className="flex justify-end gap-4">
-        {showPrev !== false && (
-          <Button onClick={onPrev}>
-            <ArrowLeftIcon className="size-4" /> Previous
-          </Button>
-        )}
-        <Button onClick={onReset}>Reset</Button>
-        <Button type="submit">
-          Finish <ArrowRightIcon className="size-4" />
-        </Button>
       </div>
+      {form.formState.errors.email && (
+        <p className="text-destructive">{form.formState.errors.email.message}</p>
+      )}
+      <Button className="self-end" size="lg">
+        Add
+      </Button>
     </form>
   );
 };
@@ -373,7 +428,7 @@ const CreateWorkspaceStepper = () => {
             </StepperItem>
           ))}
         </StepperNav>
-        <StepperPanel className="w-xs text-center text-sm sm:w-xl">
+        <StepperPanel className="w-xs text-sm sm:w-xl">
           {steps.map((step) => (
             <StepperContent key={step.id} value={step.id}>
               <div className="flex flex-col items-center gap-4 px-8">
@@ -383,8 +438,8 @@ const CreateWorkspaceStepper = () => {
                       <WorkspaceInfoForm
                         defaultValues={formData.info}
                         onNext={(data: WorkspaceInfoSchema) => {
-                          setFormData((prev) => ({ ...prev, personal: data }));
-                          setValidSteps((prev) => ({ ...prev, details: true }));
+                          setFormData((prev) => ({ ...prev, info: data }));
+                          setValidSteps((prev) => ({ ...prev, info: true }));
                           goNext();
                         }}
                       />
@@ -392,24 +447,24 @@ const CreateWorkspaceStepper = () => {
 
                     {step.id === "type" && (
                       <WorkspaceType
-                        defaultValues={formData.contact}
+                        defaultType={formData.type}
                         onPrev={() => goBack()}
                         showPrev={!submitted}
-                        onNext={(data: ContactInfo) => {
-                          setFormData((prev) => ({ ...prev, contact: data }));
-                          setValidSteps((prev) => ({ ...prev, review: true }));
+                        onNext={(type: WorkspaceType) => {
+                          setFormData((prev) => ({ ...prev, type }));
+                          setValidSteps((prev) => ({ ...prev, type: true }));
                           goNext();
                         }}
                       />
                     )}
 
                     {step.id === "invites" && (
-                      <AddressForm
-                        defaultValues={formData.address}
+                      <InviteEmails
+                        defualtInviteEmails={formData.inviteEmails}
                         onPrev={() => goBack()}
                         onReset={resetAll}
                         showPrev={!submitted}
-                        onNext={(data: Address) => {
+                        onNext={(data: InviteEmailsSchema) => {
                           setFormData((prev) => ({ ...prev, address: data }));
                           setValidSteps((prev) => ({ ...prev, done: true }));
                           setSubmitted(true);
