@@ -1,7 +1,6 @@
 import prisma from "@/lib/db/prisma";
-import { nanoid } from "nanoid";
 import { getRandomAvatarColor } from "@/lib/utils";
-import { AppErrors } from "../errors/app-errors";
+import { nanoid } from "nanoid";
 
 export const userService = {
   async getUserByEmail(email: string) {

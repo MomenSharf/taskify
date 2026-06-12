@@ -1,7 +1,6 @@
 import { cn } from "@/lib/utils";
-import { IconCheckbox, IconPointerCollaboration, IconSparkles, IconSphere2 } from "@tabler/icons-react";
-import { Button } from "./button";
 import { Icons } from "../Icons";
+import { Button } from "./button";
 
 type LogoVariant = "icon" | "text" | "both";
 

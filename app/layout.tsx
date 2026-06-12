@@ -1,10 +1,8 @@
-import { TooltipProvider } from "@/components/ui/tooltip";
-import type { Metadata } from "next";
-import { Nunito, Geist } from "next/font/google";
-import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
-import { SessionProvider } from "next-auth/react";
+import type { Metadata } from "next";
+import { Geist, Nunito } from "next/font/google";
+import "./globals.css";
 import Providers from "./providers";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });

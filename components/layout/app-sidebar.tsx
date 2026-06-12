@@ -4,31 +4,28 @@ import * as React from "react";
 
 import { NavProjects } from "@/components/nav-projects";
 import { NavSecondary } from "@/components/nav-secondary";
-import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
+  SidebarMenuItem
 } from "@/components/ui/sidebar";
 import {
-  TerminalSquareIcon,
-  BotIcon,
   BookOpenIcon,
-  Settings2Icon,
-  LifeBuoyIcon,
-  SendIcon,
+  BotIcon,
   FrameIcon,
-  PieChartIcon,
+  LifeBuoyIcon,
   MapIcon,
-  TerminalIcon,
+  PieChartIcon,
+  SendIcon,
+  Settings2Icon,
+  TerminalSquareIcon
 } from "lucide-react";
+import { WorkspaceSwitcher } from "../workspace/workspace-switcher";
 import { NavMain } from "./nav-main";
 import NavSwitcher from "./nav-switcher";
-import { WorkspaceSwitcher } from "../workspace/workspace-switcher";
 
 const data = {
   user: {

@@ -29,7 +29,7 @@ interface HeroBasicProps {
   icon?: React.ReactNode;
 }
 
-interface Hero115Props extends HeroBasicProps {}
+interface Hero115Props extends HeroBasicProps {any?: string}
 type Props = Partial<Hero115Props>;
 
 const defaultProps: Hero115Props = {
@@ -69,7 +69,7 @@ const Hero115 = (props: Props) => {
           <div className="relative isolate flex flex-col gap-5">
             <div
               aria-hidden
-              className="pointer-events-none absolute top-1/2 left-1/2 -z-10 mx-auto size-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-border mask-[linear-gradient(to_top,transparent,transparent,white,white,white,transparent,transparent)] p-16 [-webkit-mask-image:linear-gradient(to_top,transparent,transparent,white,white,white,transparent,transparent)] md:size-[1300px] md:p-32"
+              className="pointer-events-none absolute top-1/2 left-1/2 -z-10 mx-auto size-200 -translate-x-1/2 -translate-y-1/2 rounded-full border border-border mask-[linear-gradient(to_top,transparent,transparent,white,white,white,transparent,transparent)] p-16 [-webkit-mask-image:linear-gradient(to_top,transparent,transparent,white,white,white,transparent,transparent)] md:size-325 md:p-32"
             >
               <div className="size-full rounded-full border border-border p-16 md:p-32">
                 <div className="size-full rounded-full border border-border" />

@@ -1,6 +1,7 @@
-import { verifyToken } from "@/lib/actions/auth/forgot-password.action";
 import ResetPassword from "@/components/auth/reset-password";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth/auth-options";
+import { authService } from "@/lib/services/auth.service";
+import { tryCatchAsync } from "@/lib/utils/try-catch";
 import { redirect } from "next/navigation";
 
 export default async function ResetPasswordPage({
@@ -22,15 +23,14 @@ export default async function ResetPasswordPage({
       `signin?errorMessage=${encodeURIComponent("Invalid reset link")}`,
     );
   }
-  try {
-    await verifyToken(token, email);
-  } catch (err: unknown) {
-    if (!(err instanceof Error)) {
-      return redirect("signin");
-    }
+  const res = await tryCatchAsync(
+    async () => await authService.validateResetLinkRequest(email, token),
+  );
 
-    return redirect(`signin?errorMessage=${encodeURIComponent(err.message)}`);
+  if(res.error) {
+    return redirect(`forgot-password?errorMessage=${encodeURIComponent(res.error.message)}`);
   }
+  
 
   return <ResetPassword token={token} email={email} />;
 }

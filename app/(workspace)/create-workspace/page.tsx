@@ -1,6 +1,6 @@
 import { Logo } from "@/components/ui/logo";
-import CreateWorkspaceStepper from "@/components/workspace/create-workspace-stepper";
-import { getCurrentUser } from "@/lib/auth";
+import CreateWorkspaceStepper from "@/components/workspace/create-workspace/create-workspace-stepper";
+import { getCurrentUser } from "@/lib/auth/auth-options";
 import { redirect } from "next/navigation";
 
 export default async function page() {

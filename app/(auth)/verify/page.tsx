@@ -42,8 +42,7 @@ export default async function Page({
     <VerifyCode
       email={email}
       initialCooldown={data.secondsLeft ?? 0}
-      attemptsLeftServer={data.attempts ?? 0}
-      maxAttempts={data.maxAttempts ?? 0}
+      
     />
   );
 }

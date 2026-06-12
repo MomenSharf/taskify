@@ -15,7 +15,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "../ui/input-otp";
 
 import {
   sendVerificationCode,
-  verifyCode,
+  verifyVerificationCode
 } from "@/lib/actions/auth/verification-email.action";
 import { IconArrowLeft, IconMailCheck } from "@tabler/icons-react";
 import { Spinner } from "../ui/spinner";
@@ -25,18 +25,16 @@ import { AuthWrapper } from "./auth-wrapper";
 export default function VerifyCode({
   email,
   initialCooldown = 0,
-  attemptsLeftServer,
-  maxAttempts,
+
 }: {
   email?: string;
   initialCooldown?: number;
-  attemptsLeftServer: number;
-  maxAttempts: number;
+
 }) {
   const [isPending, startTransition] = useTransition();
   const [cooldown, setCooldown] = useState(initialCooldown);
-  const [attemptsLeft, setAttemptsLeft] = useState<number>(attemptsLeftServer);
-  const [isLocked, setIsLocked] = useState(() => attemptsLeft >= maxAttempts);
+  // const [attemptsLeft, setAttemptsLeft] = useState<number>(attemptsLeftServer);
+  // const [isLocked, setIsLocked] = useState(() => attemptsLeft >= maxAttempts);
 
   const router = useRouter();
 
@@ -62,7 +60,7 @@ export default function VerifyCode({
         return;
       }
 
-      const res = await verifyCode(email, data.code);
+      const res = await verifyVerificationCode(email, data.code);
 
       if (res.error) {
         toast.error(res.error.message || "Something went wrong");

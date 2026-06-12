@@ -1,11 +1,11 @@
 "use server";
 
 import { authService } from "@/lib/services/auth.service";
+import { tryCatchAsync } from "@/lib/utils/try-catch";
 import { signupSchema } from "@/lib/validations/auth";
-import { safeAction } from "../save-action";
 
 export const signup = async (data: unknown) =>
-  safeAction(async () => {
+  tryCatchAsync(async () => {
     const parsed = signupSchema.parse(data);
 
     const email = await authService.signupUser(parsed);

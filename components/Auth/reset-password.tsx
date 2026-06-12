@@ -43,18 +43,16 @@ export default function ResetPassword({
   });
 
   const onSubmit = async (data: ResetPasswordInput) => {
-    try {
-      const res = await resetPassword({ token, email, ...data });
-
-      if (res.success) {
-        toast.success(res.message);
-        router.push("/signin");
-      } else {
-        toast.error(res.message || "Something went wrong! try again later");
-      }
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+    const res = await resetPassword({
+      token,
+      email,
+      newPassword: data.password,
+    });
+    if (res.error) {
+      toast.error(res.error.message || "Something went wrong! try again later");
     }
+    toast.success(res.data?.message || "Password reset successfully.");
+    router.push("/signin");
   };
 
   return (
@@ -146,7 +144,7 @@ export default function ResetPassword({
           <Field>
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting && <Spinner data-icon="inline-start" />}
-              Create Account
+              Reset Password
             </Button>
           </Field>
         </FieldGroup>

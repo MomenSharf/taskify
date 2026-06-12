@@ -1,10 +1,10 @@
 "use server";
 
 import { authService } from "@/lib/services/auth.service";
-import { safeAction } from "../save-action";
+import { tryCatchAsync } from "@/lib/utils/try-catch";
 
 export const validateEmailVerification = async (email: string) =>
-  safeAction(async () => {
+  tryCatchAsync(async () => {
     const res = await authService.validateEmailVerificationRequest(email);
 
     const messages = {
@@ -17,8 +17,8 @@ export const validateEmailVerification = async (email: string) =>
     };
   });
 
-export const verifyCode = async (email: string, token: string) =>
-  safeAction(async () => {
+export const verifyVerificationCode = async (email: string, token: string) =>
+  tryCatchAsync(async () => {
     const res = await authService.verifyCode(email, token);
 
     return {
@@ -26,8 +26,9 @@ export const verifyCode = async (email: string, token: string) =>
       email: res.email,
     };
   });
+
 export const sendVerificationCode = async (email: string) =>
-  safeAction(async () => {
+  tryCatchAsync(async () => {
     const res = await authService.sendVerificationCode(email);
 
     return {

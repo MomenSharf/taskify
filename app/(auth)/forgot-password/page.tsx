@@ -1,5 +1,5 @@
 import ForgotPassword from "@/components/auth/forgot-password";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth/auth-options";
 import { redirect } from "next/navigation";
 
 export default async function ForgotPasswordPage() {
@@ -8,5 +8,6 @@ export default async function ForgotPasswordPage() {
   if (session) {
     return redirect("/");
   }
+  
   return <ForgotPassword />;
 }

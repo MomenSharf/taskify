@@ -96,6 +96,7 @@ function Stepper({
     stepperDefRef.current = Stepperize.defineStepper(...steps)
   }
 
+  // eslint-disable-next-line react-hooks/refs
   const stepper = stepperDefRef.current.useStepper({ initialStep: defaultValue || steps[0]?.id })
 
   const [triggerNodes, setTriggerNodes] = useState<HTMLButtonElement[]>([])
@@ -304,6 +305,7 @@ function StepperTrigger({ asChild = false, className, children, tabIndex, ...pro
   )
 
   // Find our index among triggers for navigation
+  // eslint-disable-next-line react-hooks/refs
   const myIdx = useMemo(() => triggerNodes.findIndex((n: HTMLButtonElement) => n === btnRef.current), [triggerNodes])
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {

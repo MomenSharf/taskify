@@ -1,154 +1,29 @@
-"use server";
+'use server'
 
-import prisma from "@/lib/db/prisma";
-import {
-  notFound,
-  badRequest,
-  AppError,
-} from "@/lib/errors/app-error";
-import { sendResetPasswordEmail } from "@/lib/mailer";
-import bcrypt from "bcrypt";
-import crypto from "crypto";
+import { authService } from "@/lib/services/auth.service";
+import { tryCatchAsync } from "@/lib/utils/try-catch";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
-
-/* =========================
-   CREATE RESET TOKEN
-========================= */
-
-export const createAndSendPasswordResetToken = async (email: string) => {
-  try {
-    const user = await prisma.user.findUnique({ where: { email } });
-
-    if (!user) throw notFound("User not found");
-
-    await prisma.verificationToken.deleteMany({
-      where: { identifier: email },
-    });
-
-    const token = crypto.randomBytes(32).toString("hex");
-    const expires = new Date(Date.now() + 10 * 60 * 1000);
-
-    await prisma.verificationToken.create({
-      data: { identifier: email, token, expires },
-    });
-
-    const resetUrl = `${BASE_URL}/reset?token=${token}&email=${encodeURIComponent(email)}`;
-
-    const sendRes = await sendResetPasswordEmail(email, resetUrl);
-
-    if (!sendRes.success) {
-      throw badRequest("Failed to send email. Try again later.");
-    }
+export const sendResetPasswordLink = async (email: string) =>
+  tryCatchAsync(async () => {
+    const res = await authService.sendPasswordResetToken(email);
 
     return {
-      success: true,
-      message: "Reset link sent to your email",
+      message: "Password reset link sent successfully.",
+      email: res.to,
     };
-  } catch (error) {
-    throw AppError.from(error);
-  }
-};
-
-/* =========================
-   RESET PASSWORD
-========================= */
-
-export const resetPassword = async ({
-  token,
-  email,
-  password,
-  confirmPassword,
-}: {
-  token: string;
+  });
+  
+export const resetPassword = async (data: {
   email: string;
-  password: string;
-  confirmPassword: string;
-}) => {
-  try {
-    if (password !== confirmPassword) {
-      throw badRequest("Passwords do not match");
-    }
+  token: string;
+  newPassword: string;
+}) =>
+  tryCatchAsync(async () => {
+    const res = await authService.resetPassword(data);
 
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) throw notFound("User not found");
-
-    const record = await prisma.verificationToken.findUnique({
-      where: { identifier_token: { identifier: email, token } },
-    });
-
-    if (!record) {
-      throw badRequest("Invalid or expired token");
-    }
-
-    if (record.expires < new Date()) {
-      await prisma.verificationToken.delete({
-        where: { identifier_token: { identifier: email, token } },
-      });
-
-      throw badRequest("Token expired. Request a new one");
-    }
-
-    const isSamePassword = await bcrypt.compare(
-      password,
-      user.password ?? ""
-    );
-
-    if (isSamePassword) {
-      throw badRequest("New password must be different from old password");
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    await prisma.user.update({
-      where: { email },
-      data: { password: hashedPassword },
-    });
-
-    await prisma.verificationToken.deleteMany({
-      where: { identifier: email },
-    });
-
+      console.log(`🚀 ~ resetPassword ~ "Password reset successfully.":`, "Password reset successfully.")
     return {
-      success: true,
-      message: "Password reset successfully",
+      message: "Password reset successfully.",
+      email: res.email,
     };
-  } catch (error) {
-    throw AppError.from(error);
-  }
-};
-
-/* =========================
-   VERIFY TOKEN
-========================= */
-
-export async function verifyToken(token: string, email: string) {
-  try {
-    const foundToken = await prisma.verificationToken.findUnique({
-      where: { identifier_token: { identifier: email, token } },
-    });
-
-    if (!foundToken) {
-      throw badRequest("Invalid token");
-    }
-
-    if (foundToken.expires < new Date()) {
-      await prisma.verificationToken.delete({
-        where: { identifier_token: { identifier: email, token } },
-      });
-
-      throw badRequest("Token expired");
-    }
-
-    return {
-      success: true,
-      message: "Token is valid",
-      token: foundToken,
-    };
-  } catch (error) {
-    throw AppError.from(error);
-  }
-}
+  });

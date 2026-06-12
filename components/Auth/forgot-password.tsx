@@ -12,10 +12,10 @@ import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
-import { createAndSendPasswordResetToken } from "@/lib/actions/auth/forgot-password.action";
 import { Spinner } from "../ui/spinner";
 import { AuthWrapper } from "./auth-wrapper";
 import { IconFingerprint } from "@tabler/icons-react";
+import { sendResetPasswordLink } from "@/lib/actions/auth/forgot-password.action";
 
 export default function ForgotPassword() {
   const router = useRouter();
@@ -32,18 +32,15 @@ export default function ForgotPassword() {
   });
 
   const onSubmit = async (data: ForgotPasswordInput) => {
-    try {
-      const res = await createAndSendPasswordResetToken(data.email);
+    const res = await sendResetPasswordLink(data.email);    
 
-      if (res.success) {
-        toast.success(res.message);
-        router.push("/signin");
-      } else {
-        toast.error(res.message || "Something went wrong! try again later");
-      }
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+    if (res.error) {
+      toast.error(res.error.message || "Something went wrong");
+      return;
     }
+
+    toast.success(res.data.message);
+    router.push(`/signin`);
   };
 
   return (
