@@ -4,6 +4,8 @@ import { Nunito, Geist } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
+import { SessionProvider } from "next-auth/react";
+import Providers from "./providers";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -33,7 +35,7 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-full flex flex-col">
-        <TooltipProvider>{children}</TooltipProvider>
+          <Providers>{children}</Providers>
         <Toaster />
       </body>
     </html>

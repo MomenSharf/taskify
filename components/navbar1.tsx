@@ -25,6 +25,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { signOut, useSession } from "next-auth/react";
 
 interface MenuItem {
   title: string;
@@ -141,6 +142,7 @@ const Navbar1 = ({
   },
   className,
 }: Navbar1Props) => {
+  const sesstion = useSession();
   return (
     <section className={cn("py-4", className)}>
       <div className="container">
@@ -215,12 +217,25 @@ const Navbar1 = ({
                   </Accordion>
 
                   <div className="flex flex-col gap-3">
-                    <Button asChild variant="outline">
-                      <a href={auth.login.url}>{auth.login.title}</a>
-                    </Button>
-                    <Button asChild>
-                      <a href={auth.signup.url}>{auth.signup.title}</a>
-                    </Button>
+                    {sesstion.data?.user ? (
+                      <Button
+                        variant="destructive"
+                        onClick={() => {
+                          signOut();
+                        }}
+                      >
+                        Logout
+                      </Button>
+                    ) : (
+                      <>
+                        <Button asChild variant="outline">
+                          <a href={auth.login.url}>{auth.login.title}</a>
+                        </Button>
+                        <Button asChild>
+                          <a href={auth.signup.url}>{auth.signup.title}</a>
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               </SheetContent>

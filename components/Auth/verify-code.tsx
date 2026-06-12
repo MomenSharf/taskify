@@ -14,12 +14,12 @@ import { toast } from "sonner";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../ui/input-otp";
 
 import {
-  resendVerificationEmail,
+  sendVerificationCode,
   verifyCode,
-} from "@/app/actions/auth/verification-email.action";
+} from "@/lib/actions/auth/verification-email.action";
+import { IconArrowLeft, IconMailCheck } from "@tabler/icons-react";
 import { Spinner } from "../ui/spinner";
 import { AuthWrapper } from "./auth-wrapper";
-import { IconArrowLeft, IconMailCheck } from "@tabler/icons-react";
 
 // TODO: fix the error validation trigger when the user first input
 export default function VerifyCode({
@@ -35,15 +35,8 @@ export default function VerifyCode({
 }) {
   const [isPending, startTransition] = useTransition();
   const [cooldown, setCooldown] = useState(initialCooldown);
-  const [attemptsLeft, setAttemptsLeft] = useState<number>(
-    attemptsLeftServer,
-  );
-  const [isLocked, setIsLocked] = useState(() => (attemptsLeft >= maxAttempts));
-  //   {attemptsLeft !== null && !isLocked && (
-  //   <p className="text-sm text-muted-foreground">
-  //     {attemptsLeft} attempts left
-  //   </p>
-  // )}
+  const [attemptsLeft, setAttemptsLeft] = useState<number>(attemptsLeftServer);
+  const [isLocked, setIsLocked] = useState(() => attemptsLeft >= maxAttempts);
 
   const router = useRouter();
 
@@ -69,18 +62,15 @@ export default function VerifyCode({
         return;
       }
 
-      try {
-        await verifyCode(email, data.code);
+      const res = await verifyCode(email, data.code);
 
-        toast.success("Email verified successfully!");
-        router.push("/signin");
-      } catch (error: unknown) {
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : "Something went wrong! try again later",
-        );
+      if (res.error) {
+        toast.error(res.error.message || "Something went wrong");
+        return;
       }
+
+      toast.success(res.data.message);
+      router.push(`/`);
     },
     [email, router],
   );
@@ -99,29 +89,16 @@ export default function VerifyCode({
     if (isPending) return;
 
     startTransition(async () => {
-      try {
-        const res = await resendVerificationEmail(email);
+      const res = await sendVerificationCode(email);
 
-        if (res?.success) {
-          toast.success("Verification email resent!");
-          setCooldown(60);
-          return;
-        }
-
-        toast.error(res?.message || "Failed to resend email");
-
-        if (
-          res &&
-          "secondsLeft" in res &&
-          typeof res.secondsLeft === "number"
-        ) {
-          setCooldown(res.secondsLeft);
-        }
-      } catch (error: unknown) {
-        toast.error(
-          error instanceof Error ? error.message : "Failed to resend email",
-        );
+      if (res.error) {
+        toast.error(res.error.message || "Something went wrong");
+        return;
       }
+
+      setCooldown(60);
+      toast.success(res.data.message);
+      router.push("/signin");
     });
   };
 
@@ -208,7 +185,7 @@ export default function VerifyCode({
                     type="button"
                     variant="link"
                     size="sm"
-                    className="ml-1 h-auto p-0"
+                    className="ml-1 h-auto p-0 cursor-pointer"
                     onClick={handleResend}
                   >
                     Resend

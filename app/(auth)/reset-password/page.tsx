@@ -1,4 +1,4 @@
-import { verifyToken } from "@/app/actions/auth/forgot-password.action";
+import { verifyToken } from "@/lib/actions/auth/forgot-password.action";
 import ResetPassword from "@/components/auth/reset-password";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";

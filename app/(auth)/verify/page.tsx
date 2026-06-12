@@ -1,56 +1,49 @@
-import { validateEmailVerificationRequest } from "@/app/actions/auth/verification-email.action";
 import VerifyCode from "@/components/auth/verify-code";
-import { getCurrentUser } from "@/lib/auth";
+import { validateEmailVerification } from "@/lib/actions/auth/verification-email.action";
+import { getCurrentUser } from "@/lib/auth/auth-options";
 import { redirect } from "next/navigation";
 
-export default async function page({
+export default async function Page({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const email = (await searchParams).email;
-
   const session = await getCurrentUser();
 
-  if (session) {
-    return redirect("/");
-  }
+  const email = (await searchParams).email;
 
+  if (session) {
+    redirect("/");
+  }
   if (!email || Array.isArray(email)) {
     return redirect("/signin");
   }
+  const res = await validateEmailVerification(email);
 
-  let res;
-  try {
-    res = await validateEmailVerificationRequest(email);
-  } catch (err: unknown) {
-    if (!(err instanceof Error)) {
-      return redirect("/signin");
-    }
-
-    return redirect(`signin?errorMessage=${encodeURIComponent(err.message)}`);
+  if (res.error) {
+    redirect(
+      `/signin?errorMessage=${encodeURIComponent(
+        res.error?.message ?? "Something went wrong. Please try again.",
+      )}`,
+    );
   }
 
-  if (res.redirect) return redirect(res.redirect);
+  const data = res.data;
 
-  const { attempts, maxAttempts, secondsLeft } = res;
-
-  if (
-    !(
-      typeof attempts === "number" &&
-      typeof maxAttempts === "number" &&
-      typeof secondsLeft === "number"
-    )
-  ) {
-    return redirect("/signin");
+  if (data.status === "already_verified") {
+    redirect(
+      `/signin?errorMessage=${encodeURIComponent(
+        "Your email has already been verified. Please sign in.",
+      )}`,
+    );
   }
 
   return (
     <VerifyCode
       email={email}
-      initialCooldown={res.secondsLeft}
-      attemptsLeftServer={res.attempts}
-      maxAttempts={res.maxAttempts}
+      initialCooldown={data.secondsLeft ?? 0}
+      attemptsLeftServer={data.attempts ?? 0}
+      maxAttempts={data.maxAttempts ?? 0}
     />
   );
 }

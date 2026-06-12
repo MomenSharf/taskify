@@ -1,46 +1,50 @@
-"use client"
+"use client";
 
 import {
   ForgotPasswordInput,
   forgotPasswordSchema,
-} from "@/lib/validations/auth"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
-import { Controller, useForm } from "react-hook-form"
-import { toast } from "sonner"
+} from "@/lib/validations/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
-import { Button } from "../ui/button"
-import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field"
-import { Input } from "../ui/input"
-import { createAndSendPasswordResetToken } from "@/app/actions/auth/forgot-password.action"
-import { Spinner } from "../ui/spinner"
-import { AuthWrapper } from "./auth-wrapper"
-import { IconFingerprint } from "@tabler/icons-react"
+import { Button } from "../ui/button";
+import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";
+import { Input } from "../ui/input";
+import { createAndSendPasswordResetToken } from "@/lib/actions/auth/forgot-password.action";
+import { Spinner } from "../ui/spinner";
+import { AuthWrapper } from "./auth-wrapper";
+import { IconFingerprint } from "@tabler/icons-react";
 
 export default function ForgotPassword() {
-  const router = useRouter()
+  const router = useRouter();
 
-  const  {handleSubmit, control, formState: {isSubmitting}} = useForm<ForgotPasswordInput>({
+  const {
+    handleSubmit,
+    control,
+    formState: { isSubmitting },
+  } = useForm<ForgotPasswordInput>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: "",
     },
-  })
+  });
 
   const onSubmit = async (data: ForgotPasswordInput) => {
     try {
-      const res = await createAndSendPasswordResetToken(data.email)
+      const res = await createAndSendPasswordResetToken(data.email);
 
       if (res.success) {
-        toast.success(res.message)
-        router.push("/signin")
+        toast.success(res.message);
+        router.push("/signin");
       } else {
-        toast.error(res.message || "Something went wrong! try again later")
+        toast.error(res.message || "Something went wrong! try again later");
       }
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong")
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
     }
-  }
+  };
 
   return (
     <AuthWrapper
@@ -71,27 +75,19 @@ export default function ForgotPassword() {
                   aria-invalid={fieldState.invalid}
                 />
 
-                {fieldState.error && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
+                {fieldState.error && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
           />
 
           <Field>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isSubmitting}
-            >
-              {isSubmitting && (
-                <Spinner data-icon="inline-start" />
-              )}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting && <Spinner data-icon="inline-start" />}
               Send Reset Link
             </Button>
           </Field>
         </FieldGroup>
       </form>
     </AuthWrapper>
-  )
+  );
 }

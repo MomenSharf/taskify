@@ -10,7 +10,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { resetPassword } from "@/app/actions/auth/forgot-password.action";
+import { resetPassword } from "@/lib/actions/auth/forgot-password.action";
 import { IconEye, IconEyeOff, IconLock } from "@tabler/icons-react";
 import { Button } from "../ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "../ui/field";

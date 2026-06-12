@@ -113,8 +113,6 @@ export default function NavSwitcher() {
   )!;
 
   const inMoreItems = navItems.filter((item) => item.state === "inMore");
-  console.log('secondPendingItem');
-  console.log(secondPendingItem);
   
   if (!selectedItem || !firstPendingItem || !secondPendingItem) return null;
   

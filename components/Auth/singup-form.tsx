@@ -1,6 +1,6 @@
 "use client";
 
-import { signup } from "@/app/actions/auth/signup.action";
+import { signup } from "@/lib/actions/auth/signup.action";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -12,11 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { SignupInput, signupSchema } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  IconEye,
-  IconEyeOff,
-  IconUserPlus
-} from "@tabler/icons-react";
+import { IconEye, IconEyeOff, IconUserPlus } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -47,19 +43,16 @@ export function SignupForm() {
   });
 
   const onSubmit = async (data: SignupInput) => {
-    try {
-      const res = await signup(data);
+  const res = await signup(data);
 
-      if (res.success) {
-        toast.success(res.message);
-        router.push(`/verify?email=${data.email}`);
-      } else {
-        toast.error(res.message || "Something went wrong! try again later");
-      }
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
-    }
-  };
+  if (res.error) {
+    toast.error(res.error.message || "Something went wrong");
+    return;
+  }
+
+  toast.success(res.data.message);
+  router.push(`/verify?email=${data.email}`);
+};
 
   return (
     <AuthWrapper

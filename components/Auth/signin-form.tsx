@@ -9,8 +9,10 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { AUTH_ERRORS } from "@/lib/errors/auth-errors";
 import { SigninInput, signinSchema } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconEye, IconEyeOff, IconLogin } from "@tabler/icons-react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -18,9 +20,8 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Icons } from "../Icons";
-import { AuthWrapper } from "./auth-wrapper";
 import { Spinner } from "../ui/spinner";
-import { IconEye, IconEyeOff, IconLogin } from "@tabler/icons-react";
+import { AuthWrapper } from "./auth-wrapper";
 
 // TODO: Google provider
 export function SigninForm() {
@@ -53,12 +54,13 @@ export function SigninForm() {
     }
 
     if (res.error) {
-      toast.error(mapAuthError(res.error));
-
-      if (res.error === "EMAIL_NOT_VERIFIED") {
+      if (res.error === AUTH_ERRORS.EMAIL_NOT_VERIFIED) {
+        toast.info("Please verify your email first");
         router.push(`/verify?email=${encodeURIComponent(data.email)}`);
+        return;
       }
 
+      toast.error(mapAuthError(res.error));
       return;
     }
 
@@ -68,17 +70,21 @@ export function SigninForm() {
 
   function mapAuthError(error: string) {
     switch (error) {
-      case "MISSING_CREDENTIALS":
+      case AUTH_ERRORS.MISSING_CREDENTIALS:
         return "Please fill in all fields";
-      case "INVALID_EMAIL":
+
+      case AUTH_ERRORS.INVALID_EMAIL:
         return "No account found with this email";
-      case "NO_PASSWORD_ACCOUNT":
+
+      case AUTH_ERRORS.NO_PASSWORD_ACCOUNT:
         return "This account uses a different sign-in method";
-      case "EMAIL_NOT_VERIFIED":
+
+      case AUTH_ERRORS.EMAIL_NOT_VERIFIED:
         return "Please verify your email before continuing";
-      case "CredentialsSignin":
-      case "INVALID_PASSWORD":
+
+      case AUTH_ERRORS.INVALID_PASSWORD:
         return "Email or password is incorrect";
+
       default:
         return "Something went wrong. Please try again";
     }
